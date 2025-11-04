@@ -118,7 +118,7 @@ body {
     border-radius: 30px;
     box-shadow: 0 30px 80px rgba(0,0,0,0.3);
     padding: 40px;
-    max-width: 600px;
+    max-width: 800px;
     width: 100%;
     position: relative;
     z-index: 1;
@@ -229,6 +229,20 @@ body {
     display: inline-block;
 }
 
+.game-mascot {
+    font-size: 60px;
+    margin: 10px 0;
+    animation: mascotDance 2s ease-in-out infinite;
+    display: inline-block;
+}
+
+.result-mascot {
+    font-size: 70px;
+    margin: 10px 0;
+    animation: mascotJump 1s ease-out;
+    display: inline-block;
+}
+
 @keyframes mascotDance {
     0%, 100% {
         transform: rotate(-10deg) scale(1);
@@ -241,6 +255,89 @@ body {
     }
     75% {
         transform: rotate(10deg) scale(1.1);
+    }
+}
+
+@keyframes mascotJump {
+    0% {
+        transform: translateY(30px) scale(0);
+        opacity: 0;
+    }
+    60% {
+        transform: translateY(-20px) scale(1.2);
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+/* 吉祥物選擇 */
+.mascot-selection {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 15px;
+    margin-top: 10px;
+}
+
+.mascot-option {
+    font-size: 32px;
+    padding: 12px;
+    background: white;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 3px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    position: relative;
+}
+
+.mascot-option:hover {
+    transform: scale(1.2);
+    border-color: #667eea;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    z-index: 10;
+}
+
+.mascot-option.selected {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #764ba2;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.6);
+    animation: selectBounce 0.5s ease-out;
+}
+
+.mascot-option.selected::after {
+    content: '✓';
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    background: #4CAF50;
+    color: white;
+    font-size: 16px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+}
+
+@keyframes selectBounce {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.3) rotate(5deg);
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
     }
 }
 
@@ -776,6 +873,173 @@ body {
     75% { transform: rotate(3deg); }
 }
 
+/* 班級排行榜 */
+.class-ranking {
+    background: linear-gradient(135deg, #fff5e6 0%, #ffe6cc 100%);
+    border-radius: 20px;
+    padding: 20px;
+    margin: 30px 0;
+    border: 3px solid #ffa500;
+    box-shadow: 0 5px 20px rgba(255, 165, 0, 0.2);
+}
+
+.ranking-title {
+    font-size: 22px;
+    color: #ff8c00;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.ranking-icon {
+    font-size: 28px;
+    margin-right: 8px;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+.ranking-loading {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+    font-size: 16px;
+}
+
+.ranking-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.ranking-item {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 15px;
+    padding: 15px;
+    margin-bottom: 10px;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+    animation: slideInRight 0.5s ease-out both;
+}
+
+.ranking-item:nth-child(1) { animation-delay: 0.1s; }
+.ranking-item:nth-child(2) { animation-delay: 0.2s; }
+.ranking-item:nth-child(3) { animation-delay: 0.3s; }
+.ranking-item:nth-child(4) { animation-delay: 0.4s; }
+.ranking-item:nth-child(5) { animation-delay: 0.5s; }
+.ranking-item:nth-child(n+6) { animation-delay: 0.6s; }
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.ranking-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.ranking-item.current-user {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    border-color: #ffa500;
+    box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+    animation: highlightPulse 2s ease-in-out infinite;
+}
+
+@keyframes highlightPulse {
+    0%, 100% {
+        box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+    }
+    50% {
+        box-shadow: 0 8px 30px rgba(255, 215, 0, 0.6);
+    }
+}
+
+.ranking-rank {
+    font-size: 20px;
+    font-weight: bold;
+    min-width: 40px;
+    text-align: center;
+    margin-right: 15px;
+}
+
+.ranking-rank.rank-1 {
+    color: #ffd700;
+    font-size: 24px;
+    text-shadow: 2px 2px 4px rgba(255, 215, 0, 0.3);
+}
+
+.ranking-rank.rank-1::before {
+    content: '🥇 ';
+}
+
+.ranking-rank.rank-2 {
+    color: #c0c0c0;
+    font-size: 22px;
+}
+
+.ranking-rank.rank-2::before {
+    content: '🥈 ';
+}
+
+.ranking-rank.rank-3 {
+    color: #cd7f32;
+    font-size: 22px;
+}
+
+.ranking-rank.rank-3::before {
+    content: '🥉 ';
+}
+
+.ranking-mascot {
+    font-size: 36px;
+    margin-right: 15px;
+    animation: mascotBob 2s ease-in-out infinite;
+}
+
+@keyframes mascotBob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.ranking-info {
+    flex: 1;
+}
+
+.ranking-student {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.ranking-details {
+    font-size: 14px;
+    color: #666;
+}
+
+.ranking-score {
+    font-size: 28px;
+    font-weight: bold;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-left: 15px;
+}
+
+.ranking-empty {
+    text-align: center;
+    padding: 30px;
+    color: #999;
+    font-size: 16px;
+}
+
 .button-group {
     display: flex;
     gap: 15px;
@@ -804,9 +1068,27 @@ body {
 }
 
 /* 響應式設計 */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     .container {
         padding: 25px;
+        max-width: 95%;
+    }
+    
+    .mascot-selection {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+        padding: 15px;
+    }
+    
+    .mascot-option {
+        font-size: 28px;
+        padding: 10px;
+    }
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
     }
     
     .animated-title, .game-title {
@@ -815,6 +1097,25 @@ body {
     
     .mascot {
         font-size: 60px;
+    }
+    
+    .game-mascot {
+        font-size: 45px;
+    }
+    
+    .result-mascot {
+        font-size: 50px;
+    }
+    
+    .mascot-selection {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        padding: 12px;
+    }
+    
+    .mascot-option {
+        font-size: 26px;
+        padding: 8px;
     }
     
     .question {
@@ -849,6 +1150,52 @@ body {
     
     .info-value {
         font-size: 20px;
+    }
+    
+    /* 排行榜響應式 */
+    .ranking-title {
+        font-size: 18px;
+    }
+    
+    .ranking-icon {
+        font-size: 24px;
+    }
+    
+    .ranking-item {
+        padding: 12px;
+    }
+    
+    .ranking-rank {
+        font-size: 16px;
+        min-width: 35px;
+        margin-right: 10px;
+    }
+    
+    .ranking-rank.rank-1 {
+        font-size: 20px;
+    }
+    
+    .ranking-rank.rank-2,
+    .ranking-rank.rank-3 {
+        font-size: 18px;
+    }
+    
+    .ranking-mascot {
+        font-size: 28px;
+        margin-right: 10px;
+    }
+    
+    .ranking-student {
+        font-size: 14px;
+    }
+    
+    .ranking-details {
+        font-size: 12px;
+    }
+    
+    .ranking-score {
+        font-size: 22px;
+        margin-left: 10px;
     }
 }
 

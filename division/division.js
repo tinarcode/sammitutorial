@@ -3,6 +3,7 @@ let gameState = {
     class: '',
     studentId: '',
     difficulty: 'easy',
+    mascot: '🐻', // 預設吉祥物
     score: 0,
     totalQuestions: 0,
     correctAnswers: 0,
@@ -53,11 +54,13 @@ function startGame() {
         return;
     }
     
-    // 初始化遊戲狀態
+    // 初始化遊戲狀態（保留已選擇的吉祥物）
+    const selectedMascot = gameState.mascot;
     gameState = {
         class: classInput,
         studentId: studentIdInput,
         difficulty: difficultySelect,
+        mascot: selectedMascot,
         score: 0,
         totalQuestions: 0,
         correctAnswers: 0,
@@ -72,6 +75,9 @@ function startGame() {
     
     // 更新學生資訊顯示
     document.getElementById('studentInfo').textContent = `${classInput} - ${studentIdInput}`;
+    
+    // 顯示選擇的吉祥物
+    document.getElementById('gameMascot').textContent = gameState.mascot;
     
     // 生成第一題
     generateQuestion();
@@ -177,6 +183,9 @@ async function endGame() {
         Math.round((gameState.correctAnswers / gameState.totalQuestions) * 100) + '%';
     document.getElementById('finalTime').textContent = formatTime(gameState.timeSpent);
     
+    // 顯示選擇的吉祥物
+    document.getElementById('resultMascot').textContent = gameState.mascot;
+    
     // 顯示鼓勵語和星星評分
     const accuracy = gameState.correctAnswers / gameState.totalQuestions;
     let encouragement = '';
@@ -204,6 +213,9 @@ async function endGame() {
     
     // 儲存成績到資料庫
     await saveScore();
+    
+    // 載入班級排行榜
+    await loadClassRanking();
 }
 
 // 儲存成績到資料庫
@@ -233,7 +245,8 @@ async function saveScore() {
             total_questions: gameState.totalQuestions,
             correct_answers: gameState.correctAnswers,
             time_spent: gameState.timeSpent,
-            difficulty: gameState.difficulty
+            difficulty: gameState.difficulty,
+            mascot: gameState.mascot
         };
         
         let response;
@@ -279,6 +292,84 @@ async function saveScore() {
         }
     } catch (error) {
         console.error('儲存成績錯誤:', error);
+    }
+}
+
+// 載入班級排行榜
+async function loadClassRanking() {
+    const loadingEl = document.getElementById('rankingLoading');
+    const listEl = document.getElementById('rankingList');
+    const infoEl = document.getElementById('rankingClassInfo');
+    
+    try {
+        // 顯示載入中
+        loadingEl.style.display = 'block';
+        listEl.innerHTML = '';
+        
+        // 更新標題
+        const difficultyNames = {
+            'easy': '簡單',
+            'medium': '中等',
+            'hard': '困難'
+        };
+        infoEl.textContent = `${gameState.class} - ${difficultyNames[gameState.difficulty]}難度排行榜`;
+        
+        // 查詢同班級同難度的所有記錄
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                sql: `SELECT student_id, score, correct_answers, total_questions, mascot, created_at
+                      FROM division_game_records 
+                      WHERE class = '${gameState.class}' 
+                      AND difficulty = '${gameState.difficulty}'
+                      ORDER BY score DESC, correct_answers DESC, time_spent ASC
+                      LIMIT 10`
+            })
+        });
+        
+        const data = await response.json();
+        
+        // 隱藏載入中
+        loadingEl.style.display = 'none';
+        
+        if (data.status === 'success' && data.data && data.data.length > 0) {
+            // 顯示排行榜
+            data.data.forEach((record, index) => {
+                const rank = index + 1;
+                const isCurrentUser = record.student_id === gameState.studentId;
+                const mascot = record.mascot || '🐻';
+                const accuracy = Math.round((record.correct_answers / record.total_questions) * 100);
+                
+                const itemHTML = `
+                    <div class="ranking-item ${isCurrentUser ? 'current-user' : ''}">
+                        <div class="ranking-rank ${rank <= 3 ? `rank-${rank}` : ''}">${rank}</div>
+                        <div class="ranking-mascot">${mascot}</div>
+                        <div class="ranking-info">
+                            <div class="ranking-student">
+                                ${isCurrentUser ? '👤 ' : ''}學號：${record.student_id}
+                                ${isCurrentUser ? ' (你)' : ''}
+                            </div>
+                            <div class="ranking-details">
+                                正確：${record.correct_answers}/${record.total_questions} (${accuracy}%)
+                            </div>
+                        </div>
+                        <div class="ranking-score">${record.score}</div>
+                    </div>
+                `;
+                
+                listEl.innerHTML += itemHTML;
+            });
+        } else {
+            // 沒有記錄
+            listEl.innerHTML = '<div class="ranking-empty">暫無排行記錄</div>';
+        }
+    } catch (error) {
+        console.error('載入排行榜錯誤:', error);
+        loadingEl.style.display = 'none';
+        listEl.innerHTML = '<div class="ranking-empty">載入失敗，請稍後再試</div>';
     }
 }
 
@@ -334,6 +425,9 @@ async function viewLeaderboard() {
 
 // 鍵盤事件處理
 document.addEventListener('DOMContentLoaded', function() {
+    // 初始化吉祥物選擇
+    initMascotSelection();
+    
     // Enter 鍵提交答案
     document.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
@@ -344,3 +438,36 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// 初始化吉祥物選擇
+function initMascotSelection() {
+    const mascotOptions = document.querySelectorAll('.mascot-option');
+    
+    // 預設選擇第一個（小熊）
+    if (mascotOptions.length > 0) {
+        mascotOptions[0].classList.add('selected');
+    }
+    
+    // 添加點擊事件
+    mascotOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            // 移除所有選中狀態
+            mascotOptions.forEach(opt => opt.classList.remove('selected'));
+            
+            // 添加選中狀態
+            this.classList.add('selected');
+            
+            // 更新顯示的吉祥物
+            const selectedMascot = this.getAttribute('data-mascot');
+            gameState.mascot = selectedMascot;
+            document.getElementById('selectedMascot').textContent = selectedMascot;
+            
+            // 添加彈跳動畫
+            const mascotDisplay = document.getElementById('selectedMascot');
+            mascotDisplay.style.animation = 'none';
+            setTimeout(() => {
+                mascotDisplay.style.animation = 'mascotDance 2s ease-in-out infinite';
+            }, 10);
+        });
+    });
+}

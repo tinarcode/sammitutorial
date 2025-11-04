@@ -25,7 +25,37 @@
             <div class="header">
                 <h1 class="animated-title">🎮 除法小遊戲 🎯</h1>
                 <p class="subtitle-fancy">學習除法，快樂成長！✨</p>
-                <div class="mascot">🐻</div>
+                <div class="mascot" id="selectedMascot">🐻</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="mascotSelect">選擇你的動物夥伴：</label>
+                <div class="mascot-selection">
+                    <div class="mascot-option" data-mascot="🐻" title="小熊">🐻</div>
+                    <div class="mascot-option" data-mascot="🐼" title="熊貓">🐼</div>
+                    <div class="mascot-option" data-mascot="🐨" title="無尾熊">🐨</div>
+                    <div class="mascot-option" data-mascot="🐯" title="老虎">🐯</div>
+                    <div class="mascot-option" data-mascot="🦁" title="獅子">🦁</div>
+                    <div class="mascot-option" data-mascot="🐰" title="兔子">🐰</div>
+                    <div class="mascot-option" data-mascot="🐶" title="小狗">🐶</div>
+                    <div class="mascot-option" data-mascot="🐱" title="小貓">🐱</div>
+                    <div class="mascot-option" data-mascot="🦊" title="狐狸">🦊</div>
+                    <div class="mascot-option" data-mascot="🐵" title="猴子">🐵</div>
+                    <div class="mascot-option" data-mascot="🐸" title="青蛙">🐸</div>
+                    <div class="mascot-option" data-mascot="🐷" title="小豬">🐷</div>
+                    <div class="mascot-option" data-mascot="🐮" title="乳牛">🐮</div>
+                    <div class="mascot-option" data-mascot="🐥" title="小雞">🐥</div>
+                    <div class="mascot-option" data-mascot="🐧" title="企鵝">🐧</div>
+                    <div class="mascot-option" data-mascot="🦆" title="鴨子">🦆</div>
+                    <div class="mascot-option" data-mascot="🦉" title="貓頭鷹">🦉</div>
+                    <div class="mascot-option" data-mascot="🦋" title="蝴蝶">🦋</div>
+                    <div class="mascot-option" data-mascot="🐝" title="蜜蜂">🐝</div>
+                    <div class="mascot-option" data-mascot="🐢" title="烏龜">🐢</div>
+                    <div class="mascot-option" data-mascot="🦖" title="恐龍">🦖</div>
+                    <div class="mascot-option" data-mascot="🦄" title="獨角獸">🦄</div>
+                    <div class="mascot-option" data-mascot="🐲" title="龍">🐲</div>
+                    <div class="mascot-option" data-mascot="🦈" title="鯊魚">🦈</div>
+                </div>
             </div>
             
             <div class="form-group">
@@ -77,6 +107,7 @@
         <div id="gameScreen" class="game-screen">
             <div class="header">
                 <h1 class="game-title">🎮 除法練習 🎯</h1>
+                <div class="game-mascot" id="gameMascot">🐻</div>
                 <p id="studentInfo" class="student-info-fancy"></p>
             </div>
             
@@ -121,6 +152,7 @@
         <div id="resultScreen" class="result-screen">
             <div class="header">
                 <h1 class="result-title">🎉 遊戲結束 🎊</h1>
+                <div class="result-mascot" id="resultMascot">🐻</div>
                 <div class="celebration">🎈🎈🎈</div>
             </div>
             
@@ -129,7 +161,7 @@
                 <div class="encouragement" id="encouragement"></div>
                 
                 <div class="score-display-wrapper">
-                    <div class="score-label">總分</div>
+                    <div class="score-label">你的分數</div>
                     <div class="score-display" id="finalScore">0</div>
                     <div class="stars-rating" id="starsRating">⭐⭐⭐</div>
                 </div>
@@ -146,6 +178,18 @@
                     <div class="stat-row">
                         <span class="stat-label">花費時間：</span>
                         <span class="stat-value" id="finalTime">0分0秒</span>
+                    </div>
+                </div>
+                
+                <!-- 班級排行榜 -->
+                <div class="class-ranking">
+                    <h3 class="ranking-title">
+                        <span class="ranking-icon">🏅</span>
+                        <span id="rankingClassInfo">班級排行榜</span>
+                    </h3>
+                    <div class="ranking-loading" id="rankingLoading">載入中...</div>
+                    <div class="ranking-list" id="rankingList">
+                        <!-- 排行榜內容將由 JavaScript 動態生成 -->
                     </div>
                 </div>
                 
