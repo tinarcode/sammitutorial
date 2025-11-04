@@ -95,23 +95,25 @@
         <div id="result"></div>
     </div>
 
+    <!-- 引入 API 設定 -->
+    <script src="api-config.js"></script>
+    
     <script>
         // 測試資料庫連線
         async function testConnection() {
             const resultDiv = document.getElementById('result');
             resultDiv.className = 'loading';
-            resultDiv.textContent = '正在測試連線...';
+            resultDiv.textContent = '正在測試連線到 NAS API...';
 
             try {
-                // JavaScript 發送請求到 PHP 後端
-                const response = await fetch('backend/testdb.php');
-                const data = await response.json();
+                // 使用 api-config.js 中的設定
+                const data = await DatabaseAPI.testConnection();
                 
                 resultDiv.className = data.status === 'success' ? 'success' : 'error';
                 resultDiv.textContent = JSON.stringify(data, null, 2);
             } catch (error) {
                 resultDiv.className = 'error';
-                resultDiv.textContent = '錯誤：' + error.message + '\n\n請確認：\n1. 您有執行 PHP 的 Web 伺服器環境\n2. backend/testdb.php 檔案存在\n3. 可以連接到您的 NAS 資料庫';
+                resultDiv.textContent = '錯誤：' + error.message + '\n\n請確認：\n1. api-config.js 中的 API URL 設定正確\n2. NAS 上的 PHP API 正在運行\n3. 可以連接到您的 NAS 資料庫';
             }
         }
 
@@ -122,9 +124,8 @@
             resultDiv.textContent = '正在執行查詢...';
 
             try {
-                // 使用 GET 請求測試 API
-                const response = await fetch('backend/api.php');
-                const data = await response.json();
+                // 使用 api-config.js 中的 DatabaseAPI
+                const data = await DatabaseAPI.test();
                 
                 resultDiv.className = data.status === 'success' ? 'success' : 'error';
                 resultDiv.textContent = JSON.stringify(data, null, 2);
@@ -150,19 +151,8 @@
             resultDiv.textContent = '正在執行查詢...';
 
             try {
-                // 使用 POST 請求發送 SQL 查詢
-                const response = await fetch('backend/api.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        sql: sql,
-                        params: []
-                    })
-                });
-                
-                const data = await response.json();
+                // 使用 api-config.js 中的 DatabaseAPI
+                const data = await DatabaseAPI.query(sql);
                 
                 resultDiv.className = data.status === 'success' ? 'success' : 'error';
                 resultDiv.textContent = JSON.stringify(data, null, 2);

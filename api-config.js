@@ -3,13 +3,17 @@
 // 請將此 URL 改為您 NAS 上實際的 API 位置
 
 const API_CONFIG = {
-    // 請修改為您 NAS 上的 API URL
-    // 範例：https://singchibu.synology.me/api.php
-    // 或：http://192.168.0.243/api.php
-    baseURL: 'https://singchibu.synology.me/sammitutorial/backend/api.php',
+    // NAS API URL（使用 localhost 連接資料庫）
+    baseURL: 'https://singchibu.synology.me/sammitutorial/backend/api-localhost.php',
     
-    // 測試連線端點
-    testURL: 'https://singchibu.synology.me/sammitutorial/backend/testdb.php'
+    // 使用 localhost 連接資料庫（推薦：PHP 和 DB 在同一台 NAS）
+    testURL: 'https://singchibu.synology.me/sammitutorial/backend/testdb-localhost.php',
+    
+    // 簡單測試（不需要資料庫）- 已驗證成功 ✓
+    simpleTestURL: 'https://singchibu.synology.me/sammitutorial/backend/test-simple.php',
+    
+    // 備用：使用域名連接資料庫（可能會失敗）
+    domainTestURL: 'https://singchibu.synology.me/sammitutorial/backend/testdb.php'
 };
 
 // 資料庫 API 函數
