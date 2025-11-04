@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>測試建立表 API</title>
+    <style>
+        body { font-family: Arial; padding: 20px; max-width: 800px; margin: 0 auto; }
+        button { padding: 10px 20px; margin: 10px 5px; }
+        pre { background: #f5f5f5; padding: 15px; border-radius: 4px; overflow-x: auto; }
+        .error { background: #fee; border-left: 4px solid #f00; }
+        .success { background: #efe; border-left: 4px solid #0f0; }
+    </style>
+</head>
+<body>
+    <h1>測試建立表 API</h1>
+    
+    <button onclick="testGET()">測試 GET（基本連線）</button>
+    <button onclick="testCreateTable()">測試建立表</button>
+    <button onclick="testShowTables()">測試查看表</button>
+    
+    <h3>結果：</h3>
+    <pre id="result">點擊按鈕開始測試...</pre>
+
+    <script src="api-config.js"></script>
+    <script>
+        const resultEl = document.getElementById('result');
+        
+        // 測試 GET 請求
+        async function testGET() {
+            resultEl.textContent = '正在測試 GET 請求...';
+            resultEl.className = '';
+            
+            try {
+                const response = await fetch(API_CONFIG.baseURL);
+                const data = await response.json();
+                
+                resultEl.textContent = 'GET 請求成功：\n\n' + JSON.stringify(data, null, 2);
+                resultEl.className = 'success';
+            } catch (error) {
+                resultEl.textContent = 'GET 請求失敗：\n\n' + error.message;
+                resultEl.className = 'error';
+            }
+        }
+        
+        // 測試建立表
+        async function testCreateTable() {
+            resultEl.textContent = '正在測試建立表...';
+            resultEl.className = '';
+            
+            const testSQL = `CREATE TABLE test_table_${Date.now()} (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)`;
+            
+            const tableName = `test_table_${Date.now()}`;
+            
+            try {
+                const response = await fetch(API_CONFIG.baseURL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'create_table',
+                        table_name: tableName,
+                        sql: testSQL
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultEl.textContent = '建立表成功：\n\n' + JSON.stringify(data, null, 2);
+                    resultEl.className = 'success';
+                } else {
+                    resultEl.textContent = '建立表失敗（HTTP ' + response.status + '）：\n\n' + JSON.stringify(data, null, 2);
+                    resultEl.className = 'error';
+                }
+            } catch (error) {
+                resultEl.textContent = '請求失敗：\n\n' + error.message + '\n\nAPI URL: ' + API_CONFIG.baseURL;
+                resultEl.className = 'error';
+            }
+        }
+        
+        // 測試查看表
+        async function testShowTables() {
+            resultEl.textContent = '正在查詢所有表...';
+            resultEl.className = '';
+            
+            try {
+                const response = await fetch(API_CONFIG.baseURL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        sql: 'SHOW TABLES'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultEl.textContent = '查詢成功：\n\n' + JSON.stringify(data, null, 2);
+                    resultEl.className = 'success';
+                } else {
+                    resultEl.textContent = '查詢失敗（HTTP ' + response.status + '）：\n\n' + JSON.stringify(data, null, 2);
+                    resultEl.className = 'error';
+                }
+            } catch (error) {
+                resultEl.textContent = '請求失敗：\n\n' + error.message;
+                resultEl.className = 'error';
+            }
+        }
+        
+        // 頁面載入時顯示 API URL
+        window.onload = function() {
+            resultEl.textContent = 'API URL: ' + API_CONFIG.baseURL + '\n\n準備就緒，請點擊按鈕開始測試。';
+        };
+    </script>
+</body>
+</html>
