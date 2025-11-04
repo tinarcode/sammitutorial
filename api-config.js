@@ -4,16 +4,7 @@
 
 const API_CONFIG = {
     // NAS API URL（使用 localhost 連接資料庫）
-    baseURL: 'https://singchibu.synology.me/sammitutorial/backend/api-localhost.php',
-    
-    // 使用 localhost 連接資料庫（推薦：PHP 和 DB 在同一台 NAS）
-    testURL: 'https://singchibu.synology.me/sammitutorial/backend/testdb-localhost.php',
-    
-    // 簡單測試（不需要資料庫）- 已驗證成功 ✓
-    simpleTestURL: 'https://singchibu.synology.me/sammitutorial/backend/test-simple.php',
-    
-    // 備用：使用域名連接資料庫（可能會失敗）
-    domainTestURL: 'https://singchibu.synology.me/sammitutorial/backend/testdb.php'
+    baseURL: 'https://singchibu.synology.me/sammitutorial/backend/api-localhost.php'
 };
 
 // 資料庫 API 函數
