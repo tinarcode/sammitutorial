@@ -254,7 +254,7 @@
         }
         
         // 顯示新增模態框
-        function showAddModal() {
+        async function showAddModal() {
             if (!currentTable) {
                 showMessage('請先選擇表', 'error');
                 return;
@@ -263,14 +263,20 @@
             editingId = null;
             document.getElementById('modalTitle').textContent = '新增數據';
             
-            if (currentData.length > 0) {
-                const columns = Object.keys(currentData[0]);
-                generateForm(columns, {});
-            } else {
-                showMessage('無法取得表結構', 'error');
+            try {
+                // 直接查詢表結構
+                const data = await DatabaseAPI.query(`DESCRIBE \`${currentTable}\``);
+                
+                if (data.status === 'success' && data.data) {
+                    const columns = data.data.map(col => col.Field);
+                    generateForm(columns, {});
+                    document.getElementById('editModal').style.display = 'block';
+                } else {
+                    showMessage('無法取得表結構', 'error');
+                }
+            } catch (error) {
+                showMessage('取得表結構失敗：' + error.message, 'error');
             }
-            
-            document.getElementById('editModal').style.display = 'block';
         }
         
         // 顯示編輯模態框
@@ -303,10 +309,22 @@
                 input.id = `field_${col}`;
                 input.value = data[col] !== undefined && data[col] !== null ? data[col] : '';
                 
-                // ID 欄位設為只讀
-                if (col.toLowerCase() === 'id') {
-                    input.readOnly = true;
-                    input.style.backgroundColor = '#f0f0f0';
+                // ID 和時間戳欄位設為只讀（編輯時），新增時隱藏
+                const isAutoField = col.toLowerCase() === 'id' || 
+                                   col.toLowerCase().includes('_at') ||
+                                   col.toLowerCase().includes('timestamp');
+                
+                if (isAutoField) {
+                    if (editingId !== null) {
+                        // 編輯模式：設為只讀
+                        input.readOnly = true;
+                        input.style.backgroundColor = '#f0f0f0';
+                    } else {
+                        // 新增模式：隱藏自動欄位
+                        if (col.toLowerCase() === 'id') {
+                            div.style.display = 'none';
+                        }
+                    }
                 }
                 
                 div.appendChild(input);
@@ -328,8 +346,17 @@
             
             inputs.forEach(input => {
                 const fieldName = input.id.replace('field_', '');
-                if (!input.readOnly) {
-                    formData[fieldName] = input.value;
+                // 新增時不包含 id 欄位，更新時不包含只讀欄位
+                if (editingId === null) {
+                    // 新增：排除 id 和其他只讀欄位
+                    if (!input.readOnly && input.value.trim() !== '') {
+                        formData[fieldName] = input.value;
+                    }
+                } else {
+                    // 更新：只排除只讀欄位
+                    if (!input.readOnly) {
+                        formData[fieldName] = input.value;
+                    }
                 }
             });
             
