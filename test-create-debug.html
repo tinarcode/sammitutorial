@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>除錯測試 - 建立表</title>
+    <style>
+        body { font-family: Arial; padding: 20px; max-width: 900px; margin: 0 auto; }
+        button { padding: 12px 24px; margin: 10px 5px; font-size: 16px; }
+        pre { background: #f5f5f5; padding: 15px; border-radius: 4px; overflow-x: auto; white-space: pre-wrap; }
+        .error { background: #fee; border-left: 4px solid #f00; }
+        .success { background: #efe; border-left: 4px solid #0f0; }
+        .info { background: #eef; border-left: 4px solid #00f; }
+    </style>
+</head>
+<body>
+    <h1>除錯測試 - 建立表功能</h1>
+    
+    <button onclick="testCreateTable()">測試建立表</button>
+    <button onclick="testWithDebug()">詳細除錯測試</button>
+    
+    <h3>結果：</h3>
+    <pre id="result">點擊按鈕開始測試...</pre>
+
+    <script src="api-config.js"></script>
+    <script>
+        const resultEl = document.getElementById('result');
+        
+        // 測試建立表
+        async function testCreateTable() {
+            resultEl.textContent = '正在測試建立表...\n\nAPI URL: ' + API_CONFIG.baseURL;
+            resultEl.className = 'info';
+            
+            const tableName = `test_table_${Date.now()}`;
+            const testSQL = `CREATE TABLE ${tableName} (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)`;
+            
+            const requestData = {
+                action: 'create_table',
+                table_name: tableName,
+                sql: testSQL
+            };
+            
+            resultEl.textContent += '\n\n請求資料：\n' + JSON.stringify(requestData, null, 2);
+            
+            try {
+                const response = await fetch(API_CONFIG.baseURL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                resultEl.textContent += '\n\nHTTP 狀態碼: ' + response.status;
+                resultEl.textContent += '\nContent-Type: ' + response.headers.get('content-type');
+                
+                const responseText = await response.text();
+                resultEl.textContent += '\n\n原始回應（前 500 字元）：\n' + responseText.substring(0, 500);
+                
+                // 嘗試解析 JSON
+                try {
+                    const data = JSON.parse(responseText);
+                    resultEl.textContent += '\n\nJSON 解析成功：\n' + JSON.stringify(data, null, 2);
+                    resultEl.className = data.status === 'success' ? 'success' : 'error';
+                } catch (jsonError) {
+                    resultEl.textContent += '\n\nJSON 解析失敗！\n錯誤：' + jsonError.message;
+                    resultEl.textContent += '\n\n完整回應：\n' + responseText;
+                    resultEl.className = 'error';
+                }
+            } catch (error) {
+                resultEl.textContent += '\n\n請求失敗：\n' + error.message;
+                resultEl.className = 'error';
+            }
+        }
+        
+        // 詳細除錯測試
+        async function testWithDebug() {
+            resultEl.className = 'info';
+            resultEl.textContent = '=== 詳細除錯資訊 ===\n\n';
+            
+            // 1. 測試 API 是否可訪問
+            resultEl.textContent += '步驟 1: 測試 API 基本連線 (GET)...\n';
+            try {
+                const getResponse = await fetch(API_CONFIG.baseURL);
+                resultEl.textContent += '✓ GET 請求成功 (HTTP ' + getResponse.status + ')\n';
+                const getData = await getResponse.json();
+                resultEl.textContent += '✓ 資料庫連線: ' + getData.message + '\n\n';
+            } catch (e) {
+                resultEl.textContent += '✗ GET 請求失敗: ' + e.message + '\n\n';
+                return;
+            }
+            
+            // 2. 測試查看表 (POST - SHOW TABLES)
+            resultEl.textContent += '步驟 2: 測試 POST 請求 (SHOW TABLES)...\n';
+            try {
+                const showResponse = await fetch(API_CONFIG.baseURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sql: 'SHOW TABLES' })
+                });
+                resultEl.textContent += '✓ SHOW TABLES 成功 (HTTP ' + showResponse.status + ')\n';
+                const showData = await showResponse.json();
+                resultEl.textContent += '✓ 找到 ' + showData.count + ' 個表\n\n';
+            } catch (e) {
+                resultEl.textContent += '✗ SHOW TABLES 失敗: ' + e.message + '\n\n';
+            }
+            
+            // 3. 測試建立表
+            resultEl.textContent += '步驟 3: 測試建立表 (CREATE TABLE)...\n';
+            const tableName = `debug_test_${Date.now()}`;
+            const createSQL = `CREATE TABLE ${tableName} (id INT PRIMARY KEY, name VARCHAR(50))`;
+            
+            try {
+                const createResponse = await fetch(API_CONFIG.baseURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'create_table',
+                        table_name: tableName,
+                        sql: createSQL
+                    })
+                });
+                
+                resultEl.textContent += 'HTTP 狀態: ' + createResponse.status + '\n';
+                resultEl.textContent += 'Content-Type: ' + createResponse.headers.get('content-type') + '\n';
+                
+                const responseText = await createResponse.text();
+                
+                // 檢查是否為 HTML
+                if (responseText.trim().startsWith('<')) {
+                    resultEl.textContent += '✗ 錯誤！返回的是 HTML 而不是 JSON\n';
+                    resultEl.textContent += '\n前 1000 字元：\n' + responseText.substring(0, 1000);
+                    resultEl.className = 'error';
+                } else {
+                    const createData = JSON.parse(responseText);
+                    resultEl.textContent += '✓ 建立表成功！\n';
+                    resultEl.textContent += '\n回應：\n' + JSON.stringify(createData, null, 2);
+                    resultEl.className = 'success';
+                }
+            } catch (e) {
+                resultEl.textContent += '✗ 建立表失敗: ' + e.message + '\n';
+                resultEl.className = 'error';
+            }
+        }
+        
+        // 顯示當前配置
+        window.onload = function() {
+            resultEl.textContent = 'API 配置：\n' + JSON.stringify(API_CONFIG, null, 2) + '\n\n準備就緒，請點擊按鈕開始測試。';
+        };
+    </script>
+</body>
+</html>
