@@ -177,19 +177,30 @@ async function endGame() {
         Math.round((gameState.correctAnswers / gameState.totalQuestions) * 100) + '%';
     document.getElementById('finalTime').textContent = formatTime(gameState.timeSpent);
     
-    // 顯示鼓勵語
+    // 顯示鼓勵語和星星評分
     const accuracy = gameState.correctAnswers / gameState.totalQuestions;
     let encouragement = '';
+    let stars = '';
+    
     if (accuracy >= 0.9) {
         encouragement = '🌟 太厲害了！你是除法小天才！';
+        stars = '⭐⭐⭐⭐⭐';
     } else if (accuracy >= 0.7) {
         encouragement = '👍 做得很好！繼續加油！';
+        stars = '⭐⭐⭐⭐';
     } else if (accuracy >= 0.5) {
         encouragement = '💪 不錯哦！多練習會更進步！';
+        stars = '⭐⭐⭐';
+    } else if (accuracy >= 0.3) {
+        encouragement = '😊 繼續努力！你會越來越棒！';
+        stars = '⭐⭐';
     } else {
-        encouragement = '😊 沒關係，再試一次會更好！';
+        encouragement = '🌱 加油！每次練習都是進步！';
+        stars = '⭐';
     }
+    
     document.getElementById('encouragement').textContent = encouragement;
+    document.getElementById('starsRating').textContent = stars;
     
     // 儲存成績到資料庫
     await saveScore();
@@ -198,25 +209,68 @@ async function endGame() {
 // 儲存成績到資料庫
 async function saveScore() {
     try {
-        const response = await fetch(API_URL, {
+        // 先檢查是否已有相同班級、學號、難度的記錄
+        const checkResponse = await fetch(API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                action: 'insert',
-                table: 'division_game_records',
-                data: {
-                    class: gameState.class,
-                    student_id: gameState.studentId,
-                    score: gameState.score,
-                    total_questions: gameState.totalQuestions,
-                    correct_answers: gameState.correctAnswers,
-                    time_spent: gameState.timeSpent,
-                    difficulty: gameState.difficulty
-                }
+                sql: `SELECT id FROM division_game_records 
+                      WHERE class = '${gameState.class}' 
+                      AND student_id = '${gameState.studentId}' 
+                      AND difficulty = '${gameState.difficulty}'
+                      LIMIT 1`
             })
         });
+        
+        const checkData = await checkResponse.json();
+        
+        const scoreData = {
+            class: gameState.class,
+            student_id: gameState.studentId,
+            score: gameState.score,
+            total_questions: gameState.totalQuestions,
+            correct_answers: gameState.correctAnswers,
+            time_spent: gameState.timeSpent,
+            difficulty: gameState.difficulty
+        };
+        
+        let response;
+        
+        if (checkData.status === 'success' && checkData.data && checkData.data.length > 0) {
+            // 已存在記錄，執行更新
+            const recordId = checkData.data[0].id;
+            response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: 'update',
+                    table: 'division_game_records',
+                    data: scoreData,
+                    where: {
+                        id: recordId
+                    }
+                })
+            });
+            console.log('更新現有記錄');
+        } else {
+            // 不存在記錄，執行新增
+            response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: 'insert',
+                    table: 'division_game_records',
+                    data: scoreData
+                })
+            });
+            console.log('新增記錄');
+        }
         
         const data = await response.json();
         

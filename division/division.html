@@ -3,16 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>除法小遊戲 - 二年級數學</title>
+    <title>🎮 除法小遊戲 - 二年級數學</title>
     <link rel="stylesheet" href="division.css">
 </head>
 <body>
+    <!-- 浮動裝飾 -->
+    <div class="floating-decorations">
+        <div class="decoration">⭐</div>
+        <div class="decoration">🌟</div>
+        <div class="decoration">💫</div>
+        <div class="decoration">✨</div>
+        <div class="decoration">🎈</div>
+        <div class="decoration">🎨</div>
+        <div class="decoration">🎯</div>
+        <div class="decoration">🏆</div>
+    </div>
+    
     <div class="container">
         <!-- 登入畫面 -->
         <div id="loginScreen" class="login-screen">
             <div class="header">
-                <h1>🎮 除法小遊戲</h1>
-                <p>學習除法，快樂成長！</p>
+                <h1 class="animated-title">🎮 除法小遊戲 🎯</h1>
+                <p class="subtitle-fancy">學習除法，快樂成長！✨</p>
+                <div class="mascot">🐻</div>
             </div>
             
             <div class="form-group">
@@ -48,11 +61,14 @@
                 </select>
             </div>
             
-            <button class="btn btn-primary" onclick="startGame()">開始遊戲 🚀</button>
+            <button class="btn btn-primary btn-animated" onclick="startGame()">
+                <span class="btn-text">開始遊戲</span>
+                <span class="btn-emoji">🚀</span>
+            </button>
             
             <div style="text-align: center; margin-top: 20px;">
-                <a href="division-ranking.html" style="color: #667eea; text-decoration: none; font-size: 16px;">
-                    📊 查看排行榜
+                <a href="division-ranking.html" class="ranking-link">
+                    🏆 查看排行榜 📊
                 </a>
             </div>
         </div>
@@ -60,50 +76,63 @@
         <!-- 遊戲畫面 -->
         <div id="gameScreen" class="game-screen">
             <div class="header">
-                <h1>🎮 除法練習</h1>
-                <p id="studentInfo"></p>
+                <h1 class="game-title">🎮 除法練習 🎯</h1>
+                <p id="studentInfo" class="student-info-fancy"></p>
             </div>
             
             <div class="game-info">
-                <div class="info-item">
+                <div class="info-item info-score">
+                    <div class="info-icon">💰</div>
                     <div class="info-label">分數</div>
                     <div class="info-value" id="scoreDisplay">0</div>
                 </div>
-                <div class="info-item">
+                <div class="info-item info-question">
+                    <div class="info-icon">📝</div>
                     <div class="info-label">題數</div>
                     <div class="info-value" id="questionCount">0 / 10</div>
                 </div>
-                <div class="info-item">
+                <div class="info-item info-correct">
+                    <div class="info-icon">✅</div>
                     <div class="info-label">答對</div>
                     <div class="info-value" id="correctCount">0</div>
                 </div>
             </div>
             
             <div class="question-container">
+                <div class="question-decoration">🌈</div>
                 <div class="question" id="questionText">準備中...</div>
                 <input type="number" 
                        id="answerInput" 
                        class="answer-input" 
                        placeholder="?"
                        min="0">
+                <div class="question-decoration-bottom">🎨</div>
             </div>
             
             <div id="feedback" class="feedback"></div>
             
-            <button class="btn btn-success" onclick="checkAnswer()">確認答案 ✓</button>
+            <button class="btn btn-success btn-animated" onclick="checkAnswer()">
+                <span class="btn-text">確認答案</span>
+                <span class="btn-emoji">✓</span>
+            </button>
         </div>
         
         <!-- 結果畫面 -->
         <div id="resultScreen" class="result-screen">
             <div class="header">
-                <h1>🎉 遊戲結束</h1>
+                <h1 class="result-title">🎉 遊戲結束 🎊</h1>
+                <div class="celebration">🎈🎈🎈</div>
             </div>
             
             <div class="result-container">
+                <div class="trophy-animation">🏆</div>
                 <div class="encouragement" id="encouragement"></div>
                 
-                <div class="score-display" id="finalScore">0</div>
-                <p style="font-size: 18px; color: #666; margin-bottom: 20px;">總分</p>
+                <div class="score-display-wrapper">
+                    <div class="score-label">總分</div>
+                    <div class="score-display" id="finalScore">0</div>
+                    <div class="stars-rating" id="starsRating">⭐⭐⭐</div>
+                </div>
                 
                 <div class="result-stats">
                     <div class="stat-row">
@@ -121,8 +150,14 @@
                 </div>
                 
                 <div class="button-group">
-                    <button class="btn btn-success" onclick="playAgain()">再玩一次 🔄</button>
-                    <button class="btn btn-primary" onclick="backToHome()">返回首頁 🏠</button>
+                    <button class="btn btn-success btn-animated" onclick="playAgain()">
+                        <span class="btn-text">再玩一次</span>
+                        <span class="btn-emoji">🔄</span>
+                    </button>
+                    <button class="btn btn-primary btn-animated" onclick="backToHome()">
+                        <span class="btn-text">返回首頁</span>
+                        <span class="btn-emoji">🏠</span>
+                    </button>
                 </div>
             </div>
         </div>

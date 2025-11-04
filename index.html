@@ -1,16 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ms.Lau 教學套件</title>
+    <title>🎮 Ms.Lau 教學套件 - 快樂學習！</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
-<link rel="stylesheet" href="styles.css">
-
 <body>
-    <a href="section.html"><section>建立資料表</section></a>
-    <a href="manage-table.html"><section>管理資料表</section></a>
-    <a href="division/division.html"><section>除法遊戲</section></a>
+    <div class="stars"></div>
+    <div class="main-container">
+        <header class="header">
+            <h1 class="title bounce">🌈 Ms.Lau 教學套件</h1>
+            <p class="subtitle">歡迎來到快樂學習的世界！</p>
+        </header>
+
+        <div class="cards-container">
+            <!-- 除法遊戲卡片 -->
+            <a href="division/division.html" class="card card-game">
+                <div class="card-icon">🎮</div>
+                <h2 class="card-title">除法遊戲</h2>
+                <p class="card-description">玩遊戲學除法，挑戰高分！</p>
+                <div class="card-badge">小朋友最愛</div>
+            </a>
+
+            <!-- 管理資料表卡片 -->
+            <a href="manage-table.html" class="card card-manage">
+                <div class="card-icon">📊</div>
+                <h2 class="card-title">管理資料表</h2>
+                <p class="card-description">查看和編輯資料</p>
+                <div class="card-badge">老師專用</div>
+            </a>
+        </div>
+
+        <footer class="footer">
+            <p>💝 祝你學習愉快！</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
 </body>
-<script src="script.js"></script>
 </html>
